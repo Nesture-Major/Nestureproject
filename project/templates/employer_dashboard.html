@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}Employer Dashboard - Nesture{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Employer Dashboard</h1>
+            <p class="text-gray-600">Discover top student talent and review portfolios</p>
+        </div>
+        
+        <div class="flex gap-3">
+            <a href="{% url 'browse_students' %}" class="btn-primary">
+                <i class="fas fa-search mr-2"></i> Browse Students
+            </a>
+            <a href="{% url 'shortlisted_students' %}" class="btn-secondary">
+                <i class="fas fa-star mr-2"></i> Shortlisted
+            </a>
+        </div>
+    </div>
+    
+    <!-- Dashboard Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Employer Profile Card -->
+        <div class="dashboard-card">
+            <div class="flex flex-col items-center">
+                {% if user.profile_picture %}
+                    <img src="{{ user.profile_picture.url }}" alt="{{ user.full_name }}" class="w-24 h-24 rounded-full object-cover">
+                {% else %}
+                    <div class="w-24 h-24 rounded-full bg-primary-500 text-white flex items-center justify-center text-2xl font-semibold">
+                        {{ user.first_name|first }}{{ user.last_name|first }}
+                    </div>
+                {% endif %}
+                
+                <h2 class="mt-4 text-xl font-semibold text-gray-900">{{ user.full_name }}</h2>
+                
+                {% if user.employer_profile.company_name %}
+                    <p class="text-gray-600">{{ user.employer_profile.company_name }}</p>
+                {% endif %}
+                
+                {% if user.employer_profile.job_title %}
+                    <p class="text-gray-500 text-sm">{{ user.employer_profile.job_title }}</p>
+                {% endif %}
+                
+                <div class="w-full mt-6">
+                    <a href="{% url 'edit_profile' %}" class="block w-full text-center py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all">
+                        <i class="fas fa-edit mr-2"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+            
+            <div class="mt-6 pt-6 border-t border-gray-100">
+                <h3 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-3">Company Info</h3>
+                
+                <ul class="space-y-2">
+                    {% if user.employer_profile.company_website %}
+                        <li class="flex items-center text-gray-600">
+                            <i class="fas fa-globe w-5 text-gray-400"></i>
+                            <a href="{{ user.employer_profile.company_website }}" target="_blank" class="ml-2 text-primary-600 hover:underline">{{ user.employer_profile.company_website }}</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% if user.employer_profile.industry %}
+                        <li class="flex items-center text-gray-600">
+                            <i class="fas fa-building w-5 text-gray-400"></i>
+                            <span class="ml-2">{{ user.employer_profile.industry }}</span>
+                        </li>
+                    {% endif %}
+                    
+                    {% if user.employer_profile.company_size %}
+                        <li class="flex items-center text-gray-600">
+                            <i class="fas fa-users w-5 text-gray-400"></i>
+                            <span class="ml-2">{{ user.employer_profile.company_size }} employees</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+            
+            <div class="mt-6 pt-6 border-t border-gray-100">
+                <h3 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-3">Contact</h3>
+                
+                <ul class="space-y-2">
+                    <li class="flex items-center text-gray-600">
+                        <i class="fas fa-envelope w-5 text-gray-400"></i>
+                        <span class="ml-2">{{ user.email }}</span>
+                    </li>
+                    
+                    {% if user.employer_profile.phone %}
+                        <li class="flex items-center text-gray-600">
+                            <i class="fas fa-phone w-5 text-gray-400"></i>
+                            <span class="ml-2">{{ user.employer_profile.phone }}</span>
+                        </li>
+                    {% endif %}
+                    
+                    {% if user.employer_profile.linkedin %}
+                        <li class="flex items-center text-gray-600">
+                            <i class="fab fa-linkedin w-5 text-gray-400"></i>
+                            <a href="{{ user.employer_profile.linkedin }}" target="_blank" class="ml-2 text-primary-600 hover:underline">LinkedIn Profile</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="md:col-span-2 space-y-6">
+            <!-- Dashboard Stats -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-primary-50 p-4 rounded-lg border border-primary-100">
+                    <div class="flex justify-between items-center">
+                        <p class="text-primary-800">Students Viewed</p>
+                        <i class="fas fa-eye text-primary-400"></i>
+                    </div>
+                    <p class="text-2xl font-bold text-primary-700 mt-2">{{ students_viewed_count }}</p>
+                </div>
+                
+                <div class="bg-accent-50 p-4 rounded-lg border border-accent-100">
+                    <div class="flex justify-between items-center">
+                        <p class="text-accent-800">Shortlisted</p>
+                        <i class="fas fa-star text-accent-400"></i>
+                    </div>
+                    <p class="text-2xl font-bold text-accent-700 mt-2">{{ shortlisted_count }}</p>
+                </div>
+                
+                <div class="bg-success-50 p-4 rounded-lg border border-success-100">
+                    <div class="flex justify-between items-center">
+                        <p class="text-success-800">Messages Sent</p>
+                        <i class="fas fa-envelope text-success-400"></i>
+                    </div>
+                    <p class="text-2xl font-bold text-success-700 mt-2">{{ messages_sent_count }}</p>
+                </div>
+            </div>
+            
+            <!-- Recently Viewed Students -->
+            <div class="dashboard-card">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Recently Viewed Students</h3>
+                    <a href="{% url 'browse_students' %}" class="text-primary-600 hover:text-primary-700 text-sm">
+                        Browse All <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                
+                {% if recently_viewed_students %}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {% for student in recently_viewed_students|slice:":6" %}
+                            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-all">
+                                <div class="flex items-start gap-3">
+                                    {% if student.profile_picture %}
+                                        <img src="{{ student.profile_picture.url }}" alt="{{ student.full_name }}" class="w-12 h-12 rounded-full object-cover">
+                                    {% else %}
+                                        <div class="w-12 h-12 rounded-full bg-gray-300 text-white flex items-center justify-center font-semibold">
+                                            {{ student.first_name|first }}{{ student.last_name|first }}
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div>
+                                        <h4 class="font-medium text-gray-900">{{ student.full_name }}</h4>
+                                        <p class="text-sm text-gray-600">{{ student.student_profile.degree }}</p>
+                                        <p class="text-xs text-gray-500">{{ student.student_profile.university }}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3 flex flex-wrap gap-1">
+                                    {% for skill in student.student_profile.top_skills|slice:":3" %}
+                                        <span class="bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded">{{ skill.name }}</span>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="mt-3 flex justify-between">
+                                    <a href="{% url 'student_profile' student.id %}" class="text-primary-600 hover:text-primary-700 text-sm">
+                                        View Profile
+                                    </a>
+                                    
+                                    <button class="text-gray-500 hover:text-accent-500 {% if student.is_shortlisted %}text-accent-500{% endif %}">
+                                        <i class="fas fa-star"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-6 bg-gray-50 rounded-lg">
+                        <i class="fas fa-search text-gray-400 text-3xl mb-2"></i>
+                        <p class="text-gray-600">You haven't viewed any student profiles yet.</p>
+                        <div class="mt-4">
+                            <a href="{% url 'browse_students' %}" class="btn-primary text-sm">Browse Students</a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Top Skills in Demand -->
+            <div class="dashboard-card">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Top Skills in Demand</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Skills Chart -->
+                    <div>
+                        <div class="h-64 bg-gray-50 rounded-lg p-4">
+                            <!-- This would be a chart in a real application -->
+                            <div class="h-full flex flex-col justify-center items-center">
+                                <i class="fas fa-chart-bar text-gray-300 text-4xl mb-2"></i>
+                                <p class="text-gray-500">Skills distribution chart would appear here</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Top Skills List -->
+                    <div>
+                        <ul class="space-y-3">
+                            <li class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="w-8 h-8 flex items-center justify-center bg-primary-100 text-primary-700 rounded-full mr-3">1</span>
+                                    <span class="text-gray-900 font-medium">Python</span>
+                                </div>
+                                <span class="bg-primary-100 text-primary-700 px-2 py-1 rounded-full text-xs">68 students</span>
+                            </li>
+                            
+                            <li class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="w-8 h-8 flex items-center justify-center bg-primary-100 text-primary-700 rounded-full mr-3">2</span>
+                                    <span class="text-gray-900 font-medium">JavaScript</span>
+                                </div>
+                                <span class="bg-primary-100 text-primary-700 px-2 py-1 rounded-full text-xs">56 students</span>
+                            </li>
+                            
+                            <li class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="w-8 h-8 flex items-center justify-center bg-primary-100 text-primary-700 rounded-full mr-3">3</span>
+                                    <span class="text-gray-900 font-medium">React</span>
+                                </div>
+                                <span class="bg-primary-100 text-primary-700 px-2 py-1 rounded-full text-xs">43 students</span>
+                            </li>
+                            
+                            <li class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="w-8 h-8 flex items-center justify-center bg-primary-100 text-primary-700 rounded-full mr-3">4</span>
+                                    <span class="text-gray-900 font-medium">Machine Learning</span>
+                                </div>
+                                <span class="bg-primary-100 text-primary-700 px-2 py-1 rounded-full text-xs">37 students</span>
+                            </li>
+                            
+                            <li class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="w-8 h-8 flex items-center justify-center bg-primary-100 text-primary-700 rounded-full mr-3">5</span>
+                                    <span class="text-gray-900 font-medium">Django</span>
+                                </div>
+                                <span class="bg-primary-100 text-primary-700 px-2 py-1 rounded-full text-xs">28 students</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Messages -->
+            <div class="dashboard-card">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Recent Communications</h3>
+                    <a href="{% url 'contact_panel' %}" class="text-primary-600 hover:text-primary-700 text-sm">
+                        Contact Panel <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                
+                {% if recent_communications %}
+                    <div class="space-y-3">
+                        {% for message in recent_communications|slice:":3" %}
+                            <div class="flex items-start p-3 {% if message.is_unread %}bg-primary-50{% else %}bg-gray-50{% endif %} rounded-lg">
+                                {% if message.student.profile_picture %}
+                                    <img src="{{ message.student.profile_picture.url }}" alt="{{ message.student.full_name }}" class="w-10 h-10 rounded-full object-cover mr-3">
+                                {% else %}
+                                    <div class="w-10 h-10 rounded-full bg-gray-300 text-white flex items-center justify-center font-semibold mr-3">
+                                        {{ message.student.first_name|first }}{{ message.student.last_name|first }}
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <h4 class="text-sm font-medium text-gray-900">{{ message.student.full_name }}</h4>
+                                        <span class="text-xs text-gray-500">{{ message.sent_at|timesince }} ago</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 line-clamp-2">{{ message.content }}</p>
+                                    <div class="mt-2">
+                                        <a href="{% url 'contact_student' message.student.id %}" class="text-xs text-primary-600 hover:text-primary-700">
+                                            Reply <i class="fas fa-reply ml-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mt-4 text-center">
+                        <a href="{% url 'contact_panel' %}" class="text-primary-600 hover:text-primary-700">
+                            View all communications <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                {% else %}
+                    <p class="text-gray-500 text-center py-4">No recent communications.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

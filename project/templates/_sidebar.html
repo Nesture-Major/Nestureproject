@@ -1,0 +1,206 @@
+{% load static %}
+
+<aside id="sidebar" class="w-64 h-screen bg-white border-r border-gray-200 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-30 overflow-y-auto">
+    <!-- Logo -->
+    <div class="flex items-center justify-center p-4 border-b border-gray-200">
+        <a href="{% url 'home' %}" class="flex items-center space-x-2">
+            <img src="{% static 'images/nesture_logo.svg' %}" alt="Nesture" class="w-8 h-8">
+            <span class="text-xl font-semibold text-gray-900">Nesture</span>
+        </a>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="px-4 py-6">
+        {% if user.role == 'student' %}
+            <!-- Student Navigation -->
+            <div class="sidebar-section">Profile</div>
+            <a href="{% url 'student_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}">
+                <i class="fas fa-user-circle w-5 h-5"></i>
+                <span>Profile Overview</span>
+            </a>
+            
+            <div class="sidebar-section">Academic</div>
+            <a href="{% url 'academic_projects' %}" class="sidebar-link {% if request.resolver_match.url_name == 'academic_projects' %}active{% endif %}">
+                <i class="fas fa-graduation-cap w-5 h-5"></i>
+                <span>Academic Projects</span>
+            </a>
+            <a href="{% url 'upload_academic_project' %}" class="sidebar-link {% if request.resolver_match.url_name == 'upload_academic_project' %}active{% endif %}">
+                <i class="fas fa-upload w-5 h-5"></i>
+                <span>Upload Academic Project</span>
+            </a>
+            <a href="{% url 'project_proposals' %}" class="sidebar-link {% if request.resolver_match.url_name == 'project_proposals' %}active{% endif %}">
+                <i class="fas fa-lightbulb w-5 h-5"></i>
+                <span>Project Proposals</span>
+            </a>
+            
+            <div class="sidebar-section">Personal</div>
+            <a href="{% url 'personal_projects' %}" class="sidebar-link {% if request.resolver_match.url_name == 'personal_projects' %}active{% endif %}">
+                <i class="fas fa-laptop-code w-5 h-5"></i>
+                <span>Personal Projects</span>
+            </a>
+            <a href="{% url 'upload_personal_project' %}" class="sidebar-link {% if request.resolver_match.url_name == 'upload_personal_project' %}active{% endif %}">
+                <i class="fas fa-plus-circle w-5 h-5"></i>
+                <span>Upload Personal Project</span>
+            </a>
+            
+            <div class="sidebar-section">Portfolio</div>
+            <a href="{% url 'certifications' %}" class="sidebar-link {% if request.resolver_match.url_name == 'certifications' %}active{% endif %}">
+                <i class="fas fa-certificate w-5 h-5"></i>
+                <span>Certifications</span>
+            </a>
+            <a href="{% url 'achievements' %}" class="sidebar-link {% if request.resolver_match.url_name == 'achievements' %}active{% endif %}">
+                <i class="fas fa-trophy w-5 h-5"></i>
+                <span>Achievements</span>
+            </a>
+            <a href="{% url 'resume' %}" class="sidebar-link {% if request.resolver_match.url_name == 'resume' %}active{% endif %}">
+                <i class="fas fa-file-alt w-5 h-5"></i>
+                <span>Resume & Portfolio</span>
+            </a>
+            
+            <div class="sidebar-section">Communication</div>
+            <a href="{% url 'messages' %}" class="sidebar-link {% if request.resolver_match.url_name == 'messages' %}active{% endif %}">
+                <i class="fas fa-envelope w-5 h-5"></i>
+                <span>Messages</span>
+                {% if unread_messages %}
+                    <span class="ml-auto bg-primary-500 text-white px-2 py-1 rounded-full text-xs">{{ unread_messages }}</span>
+                {% endif %}
+            </a>
+            
+            <div class="sidebar-section">Settings</div>
+            <a href="{% url 'settings' %}" class="sidebar-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                <i class="fas fa-cog w-5 h-5"></i>
+                <span>Settings</span>
+            </a>
+            
+        {% elif user.role == 'mentor' %}
+            <!-- Mentor Navigation -->
+            <div class="sidebar-section">Profile</div>
+            <a href="{% url 'mentor_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'mentor_dashboard' %}active{% endif %}">
+                <i class="fas fa-user-circle w-5 h-5"></i>
+                <span>Profile Overview</span>
+            </a>
+            
+            <div class="sidebar-section">Students</div>
+            <a href="{% url 'assigned_students' %}" class="sidebar-link {% if request.resolver_match.url_name == 'assigned_students' %}active{% endif %}">
+                <i class="fas fa-users w-5 h-5"></i>
+                <span>Assigned Students</span>
+            </a>
+            
+            <div class="sidebar-section">Projects</div>
+            <a href="{% url 'review_proposals' %}" class="sidebar-link {% if request.resolver_match.url_name == 'review_proposals' %}active{% endif %}">
+                <i class="fas fa-clipboard-check w-5 h-5"></i>
+                <span>Review Proposals</span>
+                {% if pending_proposals %}
+                    <span class="ml-auto bg-warning-500 text-white px-2 py-1 rounded-full text-xs">{{ pending_proposals }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'review_projects' %}" class="sidebar-link {% if request.resolver_match.url_name == 'review_projects' %}active{% endif %}">
+                <i class="fas fa-tasks w-5 h-5"></i>
+                <span>Review Projects</span>
+                {% if pending_projects %}
+                    <span class="ml-auto bg-warning-500 text-white px-2 py-1 rounded-full text-xs">{{ pending_projects }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'plagiarism_report' %}" class="sidebar-link {% if request.resolver_match.url_name == 'plagiarism_report' %}active{% endif %}">
+                <i class="fas fa-copy w-5 h-5"></i>
+                <span>Plagiarism Reports</span>
+            </a>
+            
+            <div class="sidebar-section">Communication</div>
+            <a href="{% url 'student_chat' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_chat' %}active{% endif %}">
+                <i class="fas fa-comments w-5 h-5"></i>
+                <span>Chat with Students</span>
+                {% if unread_messages %}
+                    <span class="ml-auto bg-primary-500 text-white px-2 py-1 rounded-full text-xs">{{ unread_messages }}</span>
+                {% endif %}
+            </a>
+            
+            <div class="sidebar-section">Settings</div>
+            <a href="{% url 'settings' %}" class="sidebar-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                <i class="fas fa-cog w-5 h-5"></i>
+                <span>Settings</span>
+            </a>
+            
+        {% elif user.role == 'employer' %}
+            <!-- Employer Navigation -->
+            <div class="sidebar-section">Profile</div>
+            <a href="{% url 'employer_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'employer_dashboard' %}active{% endif %}">
+                <i class="fas fa-user-circle w-5 h-5"></i>
+                <span>Profile Overview</span>
+            </a>
+            
+            <div class="sidebar-section">Student Profiles</div>
+            <a href="{% url 'browse_students' %}" class="sidebar-link {% if request.resolver_match.url_name == 'browse_students' %}active{% endif %}">
+                <i class="fas fa-search w-5 h-5"></i>
+                <span>Browse Students</span>
+            </a>
+            <a href="{% url 'view_portfolios' %}" class="sidebar-link {% if request.resolver_match.url_name == 'view_portfolios' %}active{% endif %}">
+                <i class="fas fa-briefcase w-5 h-5"></i>
+                <span>View Portfolios</span>
+            </a>
+            <a href="{% url 'view_resumes' %}" class="sidebar-link {% if request.resolver_match.url_name == 'view_resumes' %}active{% endif %}">
+                <i class="fas fa-file-pdf w-5 h-5"></i>
+                <span>View & Download Resumes</span>
+            </a>
+            
+            <div class="sidebar-section">Recruitment</div>
+            <a href="{% url 'shortlisted_students' %}" class="sidebar-link {% if request.resolver_match.url_name == 'shortlisted_students' %}active{% endif %}">
+                <i class="fas fa-star w-5 h-5"></i>
+                <span>Shortlisted Students</span>
+            </a>
+            <a href="{% url 'contact_panel' %}" class="sidebar-link {% if request.resolver_match.url_name == 'contact_panel' %}active{% endif %}">
+                <i class="fas fa-envelope w-5 h-5"></i>
+                <span>Contact Panel</span>
+            </a>
+            
+            <div class="sidebar-section">Settings</div>
+            <a href="{% url 'settings' %}" class="sidebar-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                <i class="fas fa-cog w-5 h-5"></i>
+                <span>Settings</span>
+            </a>
+            
+        {% elif user.is_staff or user.is_superuser %}
+            <!-- Admin Navigation -->
+            <div class="sidebar-section">Overview</div>
+            <a href="{% url 'admin_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                <i class="fas fa-chart-line w-5 h-5"></i>
+                <span>Dashboard</span>
+            </a>
+            
+            <div class="sidebar-section">User Management</div>
+            <a href="{% url 'manage_users' %}" class="sidebar-link {% if request.resolver_match.url_name == 'manage_users' %}active{% endif %}">
+                <i class="fas fa-users-cog w-5 h-5"></i>
+                <span>Manage Users</span>
+            </a>
+            
+            <div class="sidebar-section">Projects</div>
+            <a href="{% url 'monitor_projects' %}" class="sidebar-link {% if request.resolver_match.url_name == 'monitor_projects' %}active{% endif %}">
+                <i class="fas fa-project-diagram w-5 h-5"></i>
+                <span>Monitor Projects</span>
+            </a>
+            <a href="{% url 'plagiarism_logs' %}" class="sidebar-link {% if request.resolver_match.url_name == 'plagiarism_logs' %}active{% endif %}">
+                <i class="fas fa-copy w-5 h-5"></i>
+                <span>Plagiarism Logs</span>
+                {% if high_plagiarism_count %}
+                    <span class="ml-auto bg-danger-500 text-white px-2 py-1 rounded-full text-xs">{{ high_plagiarism_count }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'project_proposals' %}" class="sidebar-link {% if request.resolver_match.url_name == 'project_proposals' %}active{% endif %}">
+                <i class="fas fa-lightbulb w-5 h-5"></i>
+                <span>Project Proposals</span>
+            </a>
+            
+            <div class="sidebar-section">Communication</div>
+            <a href="{% url 'announcements' %}" class="sidebar-link {% if request.resolver_match.url_name == 'announcements' %}active{% endif %}">
+                <i class="fas fa-bullhorn w-5 h-5"></i>
+                <span>Announcements</span>
+            </a>
+            
+            <div class="sidebar-section">Settings</div>
+            <a href="{% url 'admin_settings' %}" class="sidebar-link {% if request.resolver_match.url_name == 'admin_settings' %}active{% endif %}">
+                <i class="fas fa-cog w-5 h-5"></i>
+                <span>Settings</span>
+            </a>
+        {% endif %}
+    </nav>
+</aside>

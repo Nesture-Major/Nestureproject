@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard - Nesture{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">My Profile</h1>
+            <p class="text-gray-600">Manage your student profile and showcase your skills</p>
+        </div>
+        
+        <div class="flex gap-3">
+            <a href="{% url 'upload_academic_project' %}" class="btn-primary">
+                <i class="fas fa-plus mr-2"></i> New Academic Project
+            </a>
+            <a href="{% url 'upload_personal_project' %}" class="btn-secondary">
+                <i class="fas fa-plus mr-2"></i> New Personal Project
+            </a>
+        </div>
+    </div>
+    
+    <!-- Profile Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Profile Card -->
+        <div class="dashboard-card md:col-span-1">
+            <div class="flex flex-col items-center">
+                {% if user.profile_picture %}
+                    <img src="{{ user.profile_picture.url }}" alt="{{ user.full_name }}" class="w-24 h-24 rounded-full object-cover">
+                {% else %}
+                    <div class="w-24 h-24 rounded-full bg-primary-500 text-white flex items-center justify-center text-2xl font-semibold">
+                        {{ user.first_name|first }}{{ user.last_name|first }}
+                    </div>
+                {% endif %}
+                
+                <h2 class="mt-4 text-xl font-semibold text-gray-900">{{ user.full_name }}</h2>
+                
+                {% if user.student_profile.university %}
+                    <p class="text-gray-600">{{ user.student_profile.university }}</p>
+                {% endif %}
+                
+                {% if user.student_profile.degree %}
+                    <p class="text-gray-500 text-sm">{{ user.student_profile.degree }} - {{ user.student_profile.graduation_year }}</p>
+                {% endif %}
+                
+                <div class="w-full mt-6">
+                    <a href="{% url 'edit_profile' %}" class="block w-full text-center py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all">
+                        <i class="fas fa-edit mr-2"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+            
+            <div class="mt-6 pt-6 border-t border-gray-100">
+                <h3 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-3">Skills</h3>
+                
+                <div class="flex flex-wrap gap-2">
+                    {% for skill in user.student_profile.skills.all %}
+                        <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">{{ skill.name }}</span>
+                    {% empty %}
+                        <p class="text-gray-500 text-sm">No skills added yet. <a href="{% url 'edit_profile' %}" class="text-primary-600">Add skills</a></p>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="mt-6 pt-6 border-t border-gray-100">
+                <h3 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-3">Contact</h3>
+                
+                <ul class="space-y-2">
+                    <li class="flex items-center text-gray-600">
+                        <i class="fas fa-envelope w-5 text-gray-400"></i>
+                        <span class="ml-2">{{ user.email }}</span>
+                    </li>
+                    
+                    {% if user.student_profile.phone %}
+                        <li class="flex items-center text-gray-600">
+                            <i class="fas fa-phone w-5 text-gray-400"></i>
+                            <span class="ml-2">{{ user.student_profile.phone }}</span>
+                        </li>
+                    {% endif %}
+                    
+                    {% if user.student_profile.linkedin %}
+                        <li class="flex items-center text-gray-600">
+                            <i class="fab fa-linkedin w-5 text-gray-400"></i>
+                            <span class="ml-2">{{ user.student_profile.linkedin }}</span>
+                        </li>
+                    {% endif %}
+                    
+                    {% if user.student_profile.github %}
+                        <li class="flex items-center text-gray-600">
+                            <i class="fab fa-github w-5 text-gray-400"></i>
+                            <span class="ml-2">{{ user.student_profile.github }}</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="md:col-span-2 space-y-6">
+            <!-- Bio Section -->
+            <div class="dashboard-card">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">About Me</h3>
+                    <a href="{% url 'edit_profile' %}" class="text-primary-600 hover:text-primary-700 text-sm">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                </div>
+                
+                {% if user.student_profile.bio %}
+                    <p class="text-gray-700">{{ user.student_profile.bio }}</p>
+                {% else %}
+                    <p class="text-gray-500">No bio added yet. Tell employers and mentors about yourself.</p>
+                {% endif %}
+            </div>
+            
+            <!-- Project Stats -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-primary-50 p-4 rounded-lg border border-primary-100">
+                    <div class="flex justify-between items-center">
+                        <p class="text-primary-800">Academic Projects</p>
+                        <i class="fas fa-graduation-cap text-primary-400"></i>
+                    </div>
+                    <p class="text-2xl font-bold text-primary-700 mt-2">{{ academic_projects_count }}</p>
+                </div>
+                
+                <div class="bg-secondary-50 p-4 rounded-lg border border-secondary-100">
+                    <div class="flex justify-between items-center">
+                        <p class="text-secondary-800">Personal Projects</p>
+                        <i class="fas fa-laptop-code text-secondary-400"></i>
+                    </div>
+                    <p class="text-2xl font-bold text-secondary-700 mt-2">{{ personal_projects_count }}</p>
+                </div>
+                
+                <div class="bg-accent-50 p-4 rounded-lg border border-accent-100">
+                    <div class="flex justify-between items-center">
+                        <p class="text-accent-800">Certifications</p>
+                        <i class="fas fa-certificate text-accent-400"></i>
+                    </div>
+                    <p class="text-2xl font-bold text-accent-700 mt-2">{{ certifications_count }}</p>
+                </div>
+            </div>
+            
+            <!-- Recent Projects -->
+            <div class="dashboard-card">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Recent Projects</h3>
+                    <a href="{% url 'academic_projects' %}" class="text-primary-600 hover:text-primary-700 text-sm">
+                        View All <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                
+                {% if recent_projects %}
+                    <div class="space-y-4">
+                        {% for project in recent_projects %}
+                            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-all">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="flex items-center mb-2">
+                                            <h4 class="font-medium text-gray-900">{{ project.title }}</h4>
+                                            {% if project.project_type == 'academic' %}
+                                                <span class="ml-2 bg-primary-100 text-primary-800 text-xs px-2 py-1 rounded-full">Academic</span>
+                                            {% else %}
+                                                <span class="ml-2 bg-secondary-100 text-secondary-800 text-xs px-2 py-1 rounded-full">Personal</span>
+                                            {% endif %}
+                                            <span class="ml-2 text-gray-500 text-xs">{{ project.created_at|date:"M d, Y" }}</span>
+                                        </div>
+                                        <p class="text-gray-600 text-sm line-clamp-2">{{ project.abstract }}</p>
+                                    </div>
+                                    
+                                    <div class="flex items-center">
+                                        {% if project.status == 'approved' %}
+                                            <span class="bg-success-100 text-success-800 text-xs px-2 py-1 rounded-full">Approved</span>
+                                        {% elif project.status == 'pending' %}
+                                            <span class="bg-warning-100 text-warning-800 text-xs px-2 py-1 rounded-full">Pending</span>
+                                        {% elif project.status == 'rejected' %}
+                                            <span class="bg-danger-100 text-danger-800 text-xs px-2 py-1 rounded-full">Rejected</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                {% if project.technologies.all %}
+                                    <div class="mt-3 flex flex-wrap gap-1">
+                                        {% for tech in project.technologies.all %}
+                                            <span class="bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded">{{ tech.name }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-6 bg-gray-50 rounded-lg">
+                        <i class="fas fa-project-diagram text-gray-400 text-3xl mb-2"></i>
+                        <p class="text-gray-600">You don't have any projects yet.</p>
+                        <div class="mt-4 flex justify-center space-x-4">
+                            <a href="{% url 'upload_academic_project' %}" class="btn-primary text-sm">Upload Academic Project</a>
+                            <a href="{% url 'upload_personal_project' %}" class="btn-secondary text-sm">Upload Personal Project</a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Upcoming Deadlines -->
+            <div class="dashboard-card">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Upcoming Deadlines</h3>
+                </div>
+                
+                {% if upcoming_deadlines %}
+                    <div class="space-y-3">
+                        {% for deadline in upcoming_deadlines %}
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                <div class="flex items-center">
+                                    <div class="bg-warning-100 rounded-full p-2 mr-3">
+                                        <i class="fas fa-clock text-warning-700"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-medium text-gray-900">{{ deadline.project.title }}</h4>
+                                        <p class="text-xs text-gray-500">Due on {{ deadline.due_date|date:"M d, Y" }}</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    {% if deadline.days_left <= 3 %}
+                                        <span class="bg-danger-100 text-danger-800 text-xs px-2 py-1 rounded-full">{{ deadline.days_left }} days left</span>
+                                    {% elif deadline.days_left <= 7 %}
+                                        <span class="bg-warning-100 text-warning-800 text-xs px-2 py-1 rounded-full">{{ deadline.days_left }} days left</span>
+                                    {% else %}
+                                        <span class="bg-success-100 text-success-800 text-xs px-2 py-1 rounded-full">{{ deadline.days_left }} days left</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500 text-center py-4">No upcoming deadlines.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Portfolio Preview -->
+    <div class="dashboard-card">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Portfolio Preview</h3>
+            <a href="{% url 'resume' %}" class="text-primary-600 hover:text-primary-700 text-sm">
+                Manage Portfolio <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+        
+        <p class="text-gray-600 mb-4">This is how employers will see your profile. Make sure to keep your portfolio updated.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Personal Projects -->
+            <div class="dashboard-card bg-gray-50">
+                <div class="flex items-center mb-3">
+                    <i class="fas fa-laptop-code text-secondary-500 mr-2"></i>
+                    <h4 class="font-medium text-gray-900">Personal Projects</h4>
+                </div>
+                
+                {% if personal_projects %}
+                    <div class="space-y-2">
+                        {% for project in personal_projects|slice:":3" %}
+                            <div class="bg-white p-2 rounded border border-gray-200">
+                                <h5 class="text-sm font-medium text-gray-900">{{ project.title }}</h5>
+                                <p class="text-xs text-gray-500 line-clamp-1">{{ project.abstract }}</p>
+                            </div>
+                        {% endfor %}
+                        {% if personal_projects.count > 3 %}
+                            <p class="text-xs text-right text-primary-600">+{{ personal_projects.count|add:"-3" }} more projects</p>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-500">No personal projects yet.</p>
+                {% endif %}
+            </div>
+            
+            <!-- Certifications -->
+            <div class="dashboard-card bg-gray-50">
+                <div class="flex items-center mb-3">
+                    <i class="fas fa-certificate text-accent-500 mr-2"></i>
+                    <h4 class="font-medium text-gray-900">Certifications</h4>
+                </div>
+                
+                {% if certifications %}
+                    <div class="space-y-2">
+                        {% for cert in certifications|slice:":3" %}
+                            <div class="bg-white p-2 rounded border border-gray-200">
+                                <h5 class="text-sm font-medium text-gray-900">{{ cert.title }}</h5>
+                                <p class="text-xs text-gray-500">{{ cert.issuer }} • {{ cert.issue_date|date:"M Y" }}</p>
+                            </div>
+                        {% endfor %}
+                        {% if certifications.count > 3 %}
+                            <p class="text-xs text-right text-primary-600">+{{ certifications.count|add:"-3" }} more certifications</p>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-500">No certifications yet.</p>
+                {% endif %}
+            </div>
+            
+            <!-- Skills Visualization -->
+            <div class="dashboard-card bg-gray-50">
+                <div class="flex items-center mb-3">
+                    <i class="fas fa-code text-primary-500 mr-2"></i>
+                    <h4 class="font-medium text-gray-900">Skills</h4>
+                </div>
+                
+                {% if user.student_profile.skills.all %}
+                    <div class="space-y-3">
+                        {% for skill in user.student_profile.skills.all|slice:":5" %}
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span>{{ skill.name }}</span>
+                                    <span>{{ skill.proficiency }}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-primary-500 h-2 rounded-full" style="width: {{ skill.proficiency }}%"></div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% if user.student_profile.skills.count > 5 %}
+                            <p class="text-xs text-right text-primary-600">+{{ user.student_profile.skills.count|add:"-5" }} more skills</p>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-500">No skills added yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
